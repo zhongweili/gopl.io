@@ -28,19 +28,32 @@ import (
 
 //!+main
 
-var palette = []color.Color{color.White, color.Black}
+var palette []color.Color
 
 const (
 	whiteIndex = 0 // first color in palette
 	blackIndex = 1 // next color in palette
 )
 
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	for i := 0; i < 100; i++ {
+		palette = append(palette, color.RGBA{
+			R: uint8(rand.Intn(256)),
+			G: uint8(rand.Intn(256)),
+			B: uint8(rand.Intn(256)),
+			A: 0xFF,
+		})
+	}
+}
+
 func main() {
 	//!-main
 	// The sequence of images is deterministic unless we seed
 	// the pseudo-random number generator using the current time.
 	// Thanks to Randall McPherson for pointing out the omission.
-	rand.Seed(time.Now().UTC().UnixNano())
+
 
 	if len(os.Args) > 1 && os.Args[1] == "web" {
 		//!+http
@@ -74,7 +87,7 @@ func lissajous(out io.Writer) {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
 			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5),
-				blackIndex)
+				uint8(rand.Intn(len(palette))))
 		}
 		phase += 0.1
 		anim.Delay = append(anim.Delay, delay)
